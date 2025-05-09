@@ -1,5 +1,4 @@
 import { random } from 'lodash';
-
 export class BankAccount {
   private _balance: number;
 
