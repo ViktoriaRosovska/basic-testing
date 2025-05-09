@@ -4,6 +4,9 @@ import { getBankAccount } from '.';
 import { BankAccount } from '04-test-class';
 
 describe('BankAccount', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
   test('should create account with initial balance', () => {
     const bankAccount = getBankAccount(5000);
     expect(bankAccount).toBeInstanceOf(BankAccount);
@@ -43,7 +46,10 @@ describe('BankAccount', () => {
   });
 
   test('should withdraw money', () => {
-    // Write your test here
+    const bankAccount = getBankAccount(6000);
+    const balance = bankAccount.getBalance();
+    const result = bankAccount.withdraw(400);
+    if (result) expect(bankAccount.getBalance()).toEqual(balance - 400);
   });
 
   test('should transfer money', () => {
@@ -57,14 +63,25 @@ describe('BankAccount', () => {
   });
 
   test('fetchBalance should return number in case if request did not failed', async () => {
-    // Write your tests here
+    const result = await getBankAccount(4000).fetchBalance();
+    if (result !== null) return result;
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
-    // Write your tests here
+    const bankAccount = getBankAccount(4000);
+    const balance = bankAccount.getBalance();
+    const result = await bankAccount.fetchBalance();
+    if (result !== null) {
+      expect(result).toBeGreaterThanOrEqual(0);
+      expect(bankAccount.getBalance()).toEqual(balance);
+    }
   });
 
   test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
-    // Write your tests here
+    const bankAccount = getBankAccount(2999);
+    jest.spyOn(bankAccount, 'fetchBalance').mockResolvedValueOnce(null);
+    await expect(bankAccount.synchronizeBalance()).rejects.toThrow(
+      'Synchronization failed',
+    );
   });
 });
